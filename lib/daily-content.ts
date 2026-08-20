@@ -134,8 +134,9 @@ export const dailyQuotes = [
   "Complete the thought.","Rest is part of the rhythm.","Make progress easy to repeat.","Start where you are.",
 ];
 
-export function dayIndex(date: Date, length: number) {
-  const start = Date.UTC(date.getFullYear(), 0, 0);
-  const today = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
+export function dayIndex(dateKey: string, length: number) {
+  const [year,month,day] = dateKey.split("-").map(Number);
+  const start = Date.UTC(year, 0, 0);
+  const today = Date.UTC(year, month - 1, day);
   return Math.floor((today - start) / 86400000) % length;
 }
