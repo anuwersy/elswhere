@@ -7,7 +7,7 @@ export const metadata:Metadata={
   title:"FOCUS — Personal Execution Tracker",
   description:"Plan the right work, execute with clarity, and understand your workload.",
   metadataBase:new URL("https://focus.local"),
-  openGraph:{title:"FOCUS — Do the work that matters",description:"Personal execution, intelligently prioritized.",images:["/og.png"]},
-  twitter:{card:"summary_large_image",title:"FOCUS — Do the work that matters",description:"Personal execution, intelligently prioritized.",images:["/og.png"]}
+  openGraph:{title:"FOCUS — A calmer way to decide what matters",description:"Personal execution, thoughtfully organised.",images:["/og.png"]},
+  twitter:{card:"summary_large_image",title:"FOCUS — A calmer way to decide what matters",description:"Personal execution, thoughtfully organised.",images:["/og.png"]}
 };
 export default function RootLayout({children}:{children:React.ReactNode}){return <html lang="en"><body className={`${geistSans.variable} ${geistMono.variable}`}>{children}</body></html>}
