@@ -1,5 +1,9 @@
 node_modules/
 .next/
+.vinext/
+.output/
+.vercel/
+.wrangler/
 build/
 dist/
 .env
