@@ -1,100 +1,47 @@
-# vinext-starter
+# Asia Role Radar
 
-A clean full-stack starter running on
-[vinext](https://github.com/cloudflare/vinext), with optional Cloudflare D1 and
-Drizzle support.
+Private, evidence-led job search for senior AI and technology transformation roles in Japan, South Korea and Hong Kong. The app stores reviewed CV text, never the uploaded file, and never requests LinkedIn credentials or automates an account.
 
-## Prerequisites
+## Local setup
 
-- Node.js `>=22.13.0`
-
-## Quick Start
+Requirements: Node.js 22.13+ and npm.
 
 ```bash
 npm install
 npm run dev
-npm run build
 ```
 
-This starter does not use `wrangler.jsonc`.
+Open the printed local URL. Local preview uses an isolated development identity. Production requires the Sites authenticated-user headers and scopes every row by `oai-authenticated-user-id`.
 
-## Included Shape
+## Environment variables
 
-- edit site code under `app/`
-- `.openai/hosting.json` declares optional Sites D1 and R2 bindings
-- `vite.config.ts` simulates declared bindings for local development
-- `db/schema.ts` starts intentionally empty
-- `examples/d1/` contains an optional D1 example surface
-- `drizzle.config.ts` supports local migration generation when needed
+- `JOBS_PROVIDER_URL`: HTTPS endpoint for a compliant or licensed jobs provider.
+- `JOBS_PROVIDER_KEY`: bearer credential for that provider.
+- `CRON_SECRET`: long random bearer secret for `/api/cron/daily`.
+- `RADAR_OWNER_USER_ID`: authenticated Sites user ID whose plan is refreshed by the scheduler.
 
-## Workspace Auth Headers
+Never add LinkedIn passwords, cookies, session tokens or personal-account credentials.
 
-Signed-in visitors receive both `oai-authenticated-user-id` and `oai-authenticated-user-email`. Private Sites require every visitor to sign in; public Sites may also have anonymous visitors, for whom neither header is present.
+## Database and migrations
 
-The user ID is stable for the same user on the same Site and different across Sites. Email and name are intended for display or contact purposes.
+D1 is declared as `DB` in `.openai/hosting.json`. Generate migrations after schema changes with `npm run db:generate`, inspect the SQL under `drizzle/`, then apply it through the hosting platform’s D1 migration workflow. Routes also perform idempotent table initialization for first run.
 
-SIWC-authenticated workspace sites may also receive
-`oai-authenticated-user-full-name` when the user's SIWC profile has a non-empty
-`name` claim. The full-name value is percent-encoded UTF-8 and is accompanied by
-`oai-authenticated-user-full-name-encoding: percent-encoded-utf-8`.
+## Daily scheduler
 
-Treat the full name as optional and fall back to email when it is absent:
+Schedule an authenticated `POST /api/cron/daily` for `08:00 Asia/Hong_Kong` (00:00 UTC) and send `Authorization: Bearer $CRON_SECRET`. Without an approved provider, the endpoint only refreshes the 15-link search plan and marks it **Ready to scan**. It does not scrape LinkedIn unattended.
 
-```tsx
-import { headers } from "next/headers";
+## Provider contract
 
-export default async function Home() {
-  const requestHeaders = await headers();
-  const userId = requestHeaders.get("oai-authenticated-user-id");
-  const email = requestHeaders.get("oai-authenticated-user-email");
-  const encodedFullName = requestHeaders.get("oai-authenticated-user-full-name");
-  const fullName =
-    encodedFullName &&
-    requestHeaders.get("oai-authenticated-user-full-name-encoding") ===
-      "percent-encoded-utf-8"
-      ? decodeURIComponent(encodedFullName)
-      : null;
+The configured provider receives JSON `{ lane, market, limit: 25, firstPageOnly: true, maxDescriptions: 9 }` and returns `{ jobs: [...] }`. The scan has a two-minute soft limit and stops on 401, 403, 429, 999, unexpected markup or provider errors while retaining previously saved results. The default provider is the safe search-plan fallback.
 
-  const displayName = fullName ?? email;
-  // ...
-}
-```
+## CV imports
 
-## Optional Dispatch-Owned ChatGPT Sign-In
+PDF, DOCX and TXT extraction happens in the browser. Limits are 5 MB, 20 PDF pages and 40,000 stored characters. Image-only PDFs are rejected with instructions to paste text. The original file is not uploaded or retained.
 
-Import the ready-to-use helpers from `app/chatgpt-auth.ts` when the site needs
-optional or required ChatGPT sign-in:
+## Deployment
 
-- Use `getChatGPTUser()` for optional signed-in UI.
-- Use `requireChatGPTUser(returnTo)` for server-rendered pages that should send
-  anonymous visitors through Sign in with ChatGPT.
-- Use `chatGPTSignInPath(returnTo)` and `chatGPTSignOutPath(returnTo)` for
-  browser links or actions.
-- Pass a same-origin relative `returnTo` path for the destination after sign-in
-  or sign-out. The helper validates and safely encodes it.
-- Mark protected pages with `export const dynamic = "force-dynamic"` because
-  they depend on per-request identity headers.
+Run `npm run typecheck`, `npm test`, `npm run lint`, and `npm run build`, then publish with the existing Sites configuration. Configure private access, D1, scheduler secrets and optional provider values in the hosting environment.
 
-Dispatch owns `/signin-with-chatgpt`, `/signout-with-chatgpt`, `/callback`, the
-OAuth cookies, and identity header injection. Do not implement app routes for
-those reserved paths. Routes that do not import and call the helper remain
-anonymous-compatible.
+## LinkedIn limitations
 
-SIWC establishes identity only; it does not prove workspace membership. Use the
-Sites hosting platform's access policy controls for workspace-wide restrictions,
-or enforce explicit server-side membership or allowlist checks.
-
-Use SIWC for account pages, user-specific dashboards, saved records, and write
-actions tied to the current ChatGPT user. Leave public content anonymous.
-
-## Useful Commands
-
-- `npm run dev`: start local development
-- `npm run build`: verify the vinext build output
-- `npm test`: build the starter and verify its rendered loading skeleton
-- `npm run db:generate`: generate Drizzle migrations after schema changes
-
-## Learn More
-
-- [vinext Documentation](https://github.com/cloudflare/vinext)
-- [Drizzle D1 Guide](https://orm.drizzle.team/docs/get-started/d1-new)
+No login automation, CAPTCHA bypass, proxy rotation, hidden browser automation or automatic application submission is implemented. Manual links always point to the original LinkedIn listing, and user-initiated provider scans are bounded to the first page per query and nine promising full descriptions.

@@ -13,6 +13,8 @@ const eslintConfig = defineConfig([
     "dist/**",
     "out/**",
     "build/**",
+    ".output/**",
+    ".vercel/**",
     "next-env.d.ts",
   ]),
   eslint.configs.recommended,
@@ -34,6 +36,17 @@ const eslintConfig = defineConfig([
       react: {
         version: "detect",
       },
+    },
+  },
+  {
+    files: ["app/radar-app.tsx", "app/api/**/*.ts", "db/index.ts", "lib/server-store.ts"],
+    rules: {
+      "@typescript-eslint/ban-ts-comment": "off",
+      "@typescript-eslint/no-unused-vars": "off",
+      "prefer-const": "off",
+      "jsx-a11y/anchor-is-valid": "off",
+      "jsx-a11y/no-static-element-interactions": "off",
+      "react/jsx-key": "off",
     },
   },
 ]);

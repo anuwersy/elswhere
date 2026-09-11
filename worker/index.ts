@@ -27,6 +27,7 @@ interface ExecutionContext {
 
 const worker = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+    (globalThis as typeof globalThis & { __RADAR_ENV?: Env }).__RADAR_ENV = env;
     const url = new URL(request.url);
 
     if (url.pathname === "/_vinext/image") {

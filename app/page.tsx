@@ -1,5 +1,5 @@
-import FocusApp from "./focus-app";
+import RadarApp from "./radar-app";
 
 export default function Page(){
-  return <FocusApp initialNow={new Date().toISOString()}/>;
+  return <RadarApp/>;
 }
