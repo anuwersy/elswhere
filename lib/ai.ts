@@ -1,0 +1,9 @@
+import OpenAI from "openai";import {zodTextFormat} from "openai/helpers/zod";import {z} from "zod";import {runtimeEnv} from "./server-store";
+const calls=new Map<string,{at:number,count:number}>();
+export function limit(id:string,max=8){const now=Date.now(),v=calls.get(id);if(!v||now-v.at>60000){calls.set(id,{at:now,count:1});return false}v.count++;return v.count>max}
+export async function structured<T extends z.ZodType>(schema:T,name:string,system:string,input:string):Promise<z.infer<T>>{
+ const env=runtimeEnv() as Record<string,string|undefined>;if(!env.OPENAI_API_KEY)throw new Error("OPENAI_NOT_CONFIGURED");
+ const client=new OpenAI({apiKey:env.OPENAI_API_KEY,timeout:45000,maxRetries:0});let last:unknown;
+ for(let attempt=0;attempt<2;attempt++){try{const response=await client.responses.parse({model:env.OPENAI_MODEL||"gpt-5-mini",input:[{role:"system",content:system+(attempt?"\nYour previous structure was invalid. Return every required field exactly.":"")},{role:"user",content:input}],text:{format:zodTextFormat(schema,name)}});if(!response.output_parsed)throw new Error("Empty structured response");return schema.parse(response.output_parsed)}catch(e){last=e}}
+ throw last instanceof Error?last:new Error("MODEL_UNAVAILABLE");
+}

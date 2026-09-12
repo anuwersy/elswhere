@@ -1,6 +1,10 @@
 # Asia Role Radar
 
-Private, evidence-led job search for senior AI and technology transformation roles in Japan, South Korea and Hong Kong. The app stores reviewed CV text, never the uploaded file, and never requests LinkedIn credentials or automates an account.
+Private, CV-first career intelligence for Japan, South Korea and Hong Kong. The workflow analyses reviewed CV text, proposes evidence-grounded career directions, configures focused market scans, assesses jobs, and preserves saved-role notes across CV versions. Original documents are never stored.
+
+## Runtime configuration
+
+Set `OPENAI_API_KEY` as a server-side secret and select the model with `OPENAI_MODEL` (default `gpt-5-mini`). Optional approved providers use `JOB_PROVIDER`, `JOBS_PROVIDER_URL` and `JOBS_PROVIDER_KEY`. Set `CRON_SECRET` for daily refresh requests. Never expose these values to browser code.
 
 ## Local setup
 

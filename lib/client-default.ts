@@ -1,2 +1,1 @@
-import {DEFAULT_PROFILE} from "./defaults";import type {RadarState} from "./server-store";
-export const initialState=():RadarState=>({profile:DEFAULT_PROFILE,filters:{market:"All target markets",lane:"All career lanes",postedWithin:"One month",workplace:"Any",seniorOnly:true,salaryFloor:8000000,hideLanguageGaps:true,additionalKeywords:"",exclusions:DEFAULT_PROFILE.exclusions.join(", ")},jobs:[],runs:[],daily:{status:"Ready to scan",updatedAt:new Date().toISOString()}});
+export {initialState} from "./server-store";
