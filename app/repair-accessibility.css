@@ -1,0 +1,14 @@
+.career-app{font-size:1rem;line-height:1.5}
+.page-title p{font-size:1rem}
+.form-grid label,.direction-grid article>p,.direction-grid details p,.direction-grid li,.chips span,.scan-summary p,.analyse-bar span,.links a span,.fit span{font-size:.875rem}
+.career-main>header small,.page-title small,.career-main>header>span,.rail nav small,.trust small,.metrics small,.score small,.band,.category{font-size:.75rem}
+.job-head{gap:1rem;flex-wrap:wrap;align-items:flex-start}
+.job-head>div{min-width:0;overflow-wrap:anywhere}
+.job-head input[type=checkbox]{width:1.125rem;height:1.125rem;flex:none;margin-top:.5rem}
+.job-row>label{display:flex;flex-direction:column;gap:.5rem;margin:1rem 0}
+.job-row textarea{width:100%}
+.review>p{padding:0 1.25rem}
+.error{flex-wrap:wrap}
+.fit span{float:none;display:block}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:3px solid #176bdb;outline-offset:3px}
+@media(max-width:620px){.checks label{max-width:100%;overflow-wrap:anywhere}.job-head .actions{width:100%}.review-head{align-items:flex-start;gap:.75rem;flex-wrap:wrap}.page-title h1{letter-spacing:-.04em}.rail nav button{min-width:2.5rem}.field .actions input{min-width:0;width:100%}}

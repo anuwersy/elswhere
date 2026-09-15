@@ -9,7 +9,7 @@ describe("evidence mapping",()=>{
 });
 describe("qualification checks",()=>{
  it("flags a mandatory language conflict",()=>expect(languageGaps("Business Japanese required.",DEFAULT_PROFILE.languages)[0]).toContain("beginner"));
- it("does not make unknown Korean a gap",()=>expect(languageGaps("Fluent Korean required.",DEFAULT_PROFILE.languages)).toEqual([]));
+ it("treats unknown Korean as missing mandatory evidence",()=>expect(languageGaps("Fluent Korean required.",DEFAULT_PROFILE.languages)[0]).toContain("unknown"));
  it("applies salary floor rules",()=>expect(assessJob({id:"1",url:"https://linkedin.com/jobs/view/1",title:"AI Director",company:"A",location:"Tokyo, Japan",description:"Lead AI strategy and transformation.",salaryText:"JPY 7m",salaryMin:7000000},DEFAULT_PROFILE,8000000).flags).toContain("Salary below selected floor"));
 });
 describe("state transitions",()=>{

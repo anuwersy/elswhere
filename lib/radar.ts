@@ -1,4 +1,4 @@
-export const TOPICS: Record<string,string[]> = {
+import {canonicalJobUrl} from "./job-urls";export const TOPICS: Record<string,string[]> = {
  "AI strategy":["ai strategy","enterprise ai"], "GenAI, LLM, RAG, and AI agents":["generative ai","genai","llm","rag","agentic ai","ai agent"],
  "AI governance and Responsible AI":["ai governance","responsible ai","trusted ai"], Transformation:["transformation","digital transformation"],
  "Programme delivery":["programme delivery","program delivery","programme management","program management"], "Operating models and process improvement":["operating model","process improvement"],
@@ -26,11 +26,8 @@ export function assessRequirements(description:string,cv:string):Requirement[]{
   return {topic,jobEvidence,cvEvidence:cvLine,status,mandatory,weight:mandatory?2:1};
  });
 }
-export function languageGaps(description:string,languages:Profile["languages"]){
- const out:string[]=[]; const d=description.toLowerCase();
- for(const lang of ["japanese","korean","english"] as const){const mandatory=new RegExp(`(?:fluent|native|business|professional|mandatory|required)[^.!?]{0,30}${lang}|${lang}[^.!?]{0,40}(?:fluent|native|business|mandatory|required)`,"i").test(d); if(mandatory&&languages[lang]!=="unknown"&&!(["native","fluent","intermediate"].includes(languages[lang])))out.push(`Mandatory ${lang[0].toUpperCase()+lang.slice(1)} conflicts with saved ${languages[lang]} proficiency`)}
- return out;
-}
+export function languageRequirements(description:string){const out:{language:keyof Profile["languages"];kind:"required"|"preferred"|"advantage"|"incidental";evidence:string;minimum:LanguageLevel}[]=[];for(const evidence of description.split(/(?<=[.!?])\s+|\n+/)){for(const language of ["japanese","korean","english"] as const){if(!new RegExp("\\b"+language+"\\b","i").test(evidence))continue;const kind=/preferred|desirable|nice.to.have/i.test(evidence)?"preferred":/advantage|bonus|plus/i.test(evidence)?"advantage":/required|mandatory|must|fluent|native|business|professional/i.test(evidence)?"required":"incidental";const minimum=/native/i.test(evidence)?"native":/fluent/i.test(evidence)?"fluent":"intermediate";out.push({language,kind,evidence:evidence.trim(),minimum})}}return out}
+export function languageGaps(description:string,languages:Profile["languages"]){const rank:Record<LanguageLevel,number>={unknown:0,beginner:1,intermediate:2,fluent:3,native:4};return languageRequirements(description).filter(r=>r.kind==="required"&&rank[languages[r.language]]<rank[r.minimum]).map(r=>`Mandatory ${r.language[0].toUpperCase()+r.language.slice(1)} is not supported by saved ${languages[r.language]} proficiency. Requirement: ${r.evidence}`)}
 export function assessJob(input:Omit<Job,"keywordScore"|"evidenceScore"|"verdict"|"requirements"|"flags"|"seenAt">,profile:Profile,salaryFloor=8000000):Job{
  const reqs=assessRequirements(input.description,profile.cvText); const denom=reqs.reduce((n,r)=>n+r.weight,0); const earned=reqs.reduce((n,r)=>n+r.weight*(r.status==="Experience evidence"?1:r.status==="Skill mentioned"?.5:0),0); const evidenceScore=denom?Math.round(100*earned/denom):0;
  const text=`${input.title} ${input.description}`.toLowerCase(); const role=Math.min(40,["ai","transformation","strategy","data","governance"].filter(x=>text.includes(x)).length*8); const senior=Math.min(20,["director","head","lead","senior","manager"].filter(x=>input.title.toLowerCase().includes(x)).length*10); const capability=Math.min(25,Math.round(evidenceScore*.25)); const sector=Math.min(15,["financial services","banking","insurance"].filter(x=>text.includes(x)).length*5); const keywordScore=role+senior+capability+sector;
@@ -38,6 +35,6 @@ export function assessJob(input:Omit<Job,"keywordScore"|"evidenceScore"|"verdict
  const mandatory=reqs.filter(r=>r.mandatory&&r.status==="Not evidenced").length; const verdict=evidenceScore>=80&&!mandatory?"Strong evidence alignment":evidenceScore>=60&&!mandatory?"Potential fit — review gaps":mandatory?"Fit limited by requirement gap":evidenceScore>=35?"Stretch":"Insufficient evidence";
  return {...input,keywordScore,evidenceScore,verdict,requirements:reqs,flags,seenAt:new Date().toISOString()};
 }
-export function normalizeLinkedInUrl(raw:string){try{const u=new URL(raw);const match=u.pathname.match(/\/jobs\/view\/(?:[^/]*-)?(\d+)/);return match?`https://www.linkedin.com/jobs/view/${match[1]}`:`${u.origin}${u.pathname}`.replace(/\/$/,"")}catch{return raw.trim().toLowerCase()}}
-export function dedupeJobs(jobs:Job[]){const seen=new Set<string>();return jobs.filter(j=>{const key=j.externalId||normalizeLinkedInUrl(j.url);if(seen.has(key))return false;seen.add(key);return true})}
+export const normalizeLinkedInUrl=canonicalJobUrl;
+export function dedupeJobs(jobs:Job[]){const ids=new Set<string>(),urls=new Set<string>();return jobs.filter(j=>{let url:string;try{url=canonicalJobUrl(j.url)}catch{return false}if((j.externalId&&ids.has(j.externalId))||urls.has(url))return false;if(j.externalId)ids.add(j.externalId);urls.add(url);j.url=url;return true})}
 export function isLockAvailable(lock:{startedAt:string}|null,now=Date.now(),staleMs=130000){return !lock||now-new Date(lock.startedAt).getTime()>staleMs}

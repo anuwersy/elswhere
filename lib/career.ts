@@ -19,6 +19,7 @@ export type CareerDirection=z.infer<typeof directionSchema>;
 
 export const jobAssessmentSchema=z.object({verdict:z.enum(["Strong evidence alignment","Credible opportunity","Potential fit — review gaps","Fit limited by a mandatory requirement","Stretch opportunity","Insufficient job information"]),executiveSummary:z.string(),matchingRequirements:z.array(z.string()),partialMatches:z.array(z.string()),missingRequirements:z.array(z.string()),mandatoryGaps:z.array(z.string()),relevantEvidence:z.array(z.string()),transferableStrengths:z.array(z.string()),risks:z.array(z.string()),interviewPositioning:z.array(z.string()),cvTailoring:z.array(z.string()),applicationNarrative:z.string(),questions:z.array(z.string()),category:z.enum(["strongest","adjacent","wildcard"])}).strict();
 export function hashText(text:string){let h1=0xdeadbeef,h2=0x41c6ce57;for(const c of text.trim()){const n=c.charCodeAt(0);h1=Math.imul(h1^n,2654435761);h2=Math.imul(h2^n,1597334677)}return `${(h1>>>0).toString(16).padStart(8,"0")}${(h2>>>0).toString(16).padStart(8,"0")}`}
+export async function sha256(text:string){const bytes=new TextEncoder().encode(text.trim());const digest=await crypto.subtle.digest("SHA-256",bytes);return [...new Uint8Array(digest)].map(x=>x.toString(16).padStart(2,"0")).join("")}
 
 export function gate(state:{cv?:{analysis?:unknown};directions?:CareerDirection[];jobs?:unknown[]}){
  const analysed=!!state.cv?.analysis;const selected=state.directions?.some(d=>d.selected)||false;const hasJobs=(state.jobs?.length||0)>0;
