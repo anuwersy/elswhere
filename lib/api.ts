@@ -20,6 +20,9 @@ export async function userId(req:Request){
   }catch{
     // Treat an invalid Passport token as unauthenticated.
   }
+  const cookie=req.headers.get("cookie")||"";
+  const session=cookie.split(";").map(part=>part.trim().split("=")).find(([name])=>name==="radar_session")?.[1];
+  if(session&&/^[a-f0-9-]{20,}$/i.test(session))return `browser:${session}`;
   return null;
 }
 export function error(status:number,code:string,message:string,details?:unknown){return Response.json({error:{code,message,details}},{status})}
