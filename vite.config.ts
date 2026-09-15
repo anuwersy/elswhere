@@ -1,5 +1,7 @@
 import vinext from "vinext";
 import {defineConfig} from "vite";
+import {nitro} from "nitro/vite";
+import tailwindcss from "@tailwindcss/vite";
 import hostingConfig from "./.openai/hosting.json";
 import {sites} from "@openai/sites-vite-plugin";
 
@@ -13,6 +15,8 @@ export default defineConfig(async()=>{
  process.env.WRANGLER_WRITE_LOGS??="false";
  process.env.WRANGLER_LOG_PATH??=".wrangler/logs";
  process.env.MINIFLARE_REGISTRY_PATH??=".wrangler/registry";
+ const isVercel=process.env.NITRO_PRESET==="vercel"||process.env.VERCEL==="1";
+ if(isVercel)return {server:isCodexSeatbeltSandbox?{watch:{useFsEvents:false,usePolling:true}}:undefined,plugins:[vinext(),tailwindcss(),nitro()]};
  const {cloudflare}=await import("@cloudflare/vite-plugin");
  return {server:isCodexSeatbeltSandbox?{watch:{useFsEvents:false,usePolling:true}}:undefined,plugins:[vinext(),sites(),cloudflare({viteEnvironment:{name:"rsc",childEnvironments:["ssr"]},config:localBindingConfig})]};
 });
