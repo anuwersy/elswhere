@@ -1,4 +1,5 @@
 import {z} from "zod";
+import {getIdentity} from "@vercel/passport";
 import {canonicalJobUrl} from "./job-urls";
 
 export const jobInput=z.object({
@@ -8,11 +9,17 @@ export const jobInput=z.object({
 });
 
 /** Resolve the authenticated Sites identity, or the single protected Vercel owner. */
-export function userId(req:Request){
+export async function userId(req:Request){
   const id=req.headers.get("oai-authenticated-user-id");
   if(id)return id;
   const host=new URL(req.url).hostname;
   if(host==="localhost"||host==="127.0.0.1")return "local-preview";
+  try{
+    const identity=await getIdentity(req);
+    if(identity?.subject)return identity.subject;
+  }catch{
+    // Treat an invalid Passport token as unauthenticated.
+  }
   return null;
 }
 export function error(status:number,code:string,message:string,details?:unknown){return Response.json({error:{code,message,details}},{status})}
