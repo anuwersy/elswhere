@@ -16,7 +16,7 @@ export default defineConfig(async()=>{
  process.env.WRANGLER_LOG_PATH??=".wrangler/logs";
  process.env.MINIFLARE_REGISTRY_PATH??=".wrangler/registry";
  const isVercel=process.env.NITRO_PRESET==="vercel"||process.env.VERCEL==="1";
- if(isVercel)return {server:isCodexSeatbeltSandbox?{watch:{useFsEvents:false,usePolling:true}}:undefined,plugins:[vinext(),tailwindcss(),nitro({runtimeConfig:{openaiApiKey:"",openaiModel:"gpt-4o-mini",nitro:{envPrefix:""}}})]};
+ if(isVercel)return {server:isCodexSeatbeltSandbox?{watch:{useFsEvents:false,usePolling:true}}:undefined,plugins:[vinext(),tailwindcss(),nitro({runtimeConfig:{openaiApiKey:"",openaiModel:"gpt-4o-mini",jobsProviderUrl:"",jobsProviderKey:"",jobProvider:"",nitro:{envPrefix:""}}})]};
  const {cloudflare}=await import("@cloudflare/vite-plugin");
  return {server:isCodexSeatbeltSandbox?{watch:{useFsEvents:false,usePolling:true}}:undefined,plugins:[vinext(),sites(),cloudflare({viteEnvironment:{name:"rsc",childEnvironments:["ssr"]},config:localBindingConfig})]};
 });
