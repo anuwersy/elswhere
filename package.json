@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.3",
+    "@vercel/passport": "^1.0.1",
     "drizzle-orm": "0.45.2",
     "lucide-react": "^1.33.0",
     "mammoth": "^1.12.2",
