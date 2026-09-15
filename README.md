@@ -36,7 +36,7 @@ Schedule an authenticated `POST /api/cron/daily` for `08:00 Asia/Hong_Kong` (00:
 
 ## Provider contract
 
-The configured provider receives JSON `{ lane, market, limit: 25, firstPageOnly: true, maxDescriptions: 9 }` and returns `{ jobs: [...] }`. The scan has a two-minute soft limit and stops on 401, 403, 429, 999, unexpected markup or provider errors while retaining previously saved results. The default provider is the safe search-plan fallback.
+The configured provider receives JSON including `{ lane, market, limit: 50, firstPageOnly: false, maxDescriptions: 25, page, offset, excludeExternalIds, excludeUrls }` and returns `{ jobs: [...] }`. Repeated scans request the next page and exclude jobs already saved in the workspace. The scan has a two-minute soft limit and stops on 401, 403, 429, 999, unexpected markup or provider errors while retaining previously saved results. The default provider is the safe search-plan fallback.
 
 ## CV imports
 
