@@ -1,0 +1,1 @@
+.world-scratch{background:var(--cream) url('/random-day-map.png') center/cover no-repeat;border:0;box-shadow:12px 12px 0 var(--orange)}.world-scratch:after{background:linear-gradient(135deg,rgba(255,255,255,.08),transparent 40%);mix-blend-mode:screen}.map-label{box-shadow:5px 5px 0 var(--ink)}

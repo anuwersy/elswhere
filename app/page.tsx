@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { ArrowRight, ChevronRight, Compass, Menu, X } from "lucide-react";
-import "./random-day.css"; import "./random-day-enhancements.css"; import "./random-day-checkout.css"; import "./random-day-polish.css";
+import "./random-day.css"; import "./random-day-enhancements.css"; import "./random-day-checkout.css"; import "./random-day-polish.css"; import "./random-day-map.css";
 
 const cities=["Hong Kong","Paris","London","Tokyo","New York","Rome","Dubai","Singapore","Bangkok","Seoul","Barcelona","Amsterdam","Sydney","Lisbon","Istanbul","Los Angeles","Kyoto","Copenhagen","Mexico City","Milan"];
 const dayTypes=["A random day","Out of your comfort zone day","Occasion day","Gift day","Couple day","Memory day","Plot twist day"];
